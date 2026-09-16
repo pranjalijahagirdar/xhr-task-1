@@ -49,8 +49,8 @@ xhr.onload = function(){
 function onAddcard(eve){
     eve.preventDefault()
     let postObj={
-        title : titleControl.value,
-        body : bodyControl.value,
+        titleControl : titleControl.value,
+        bodyControl : bodyControl.value,
         userId : userId.value,
     }
     let xhr = new XMLHttpRequest();
@@ -150,6 +150,36 @@ function onUpdatecard(){
         }
     }
 }
+
+//Delete 
+
+function removeCard(ele){
+    let remove_Id = ele.closest('.col-md-4').id;
+    //REMOVE_URL
+    let REMOVE_URL = `${BASE_URL}/posts/${remove_Id}`;
+    //XHR
+    let xhr = new XMLHttpRequest()
+    //XHR.open
+    xhr.open("DELETE", REMOVE_URL)
+    //XHE.onload
+    xhr.onload =  function (){
+        if(xhr.status === 200){
+            let res = JSON.parse(xhr.response)
+            cl(res)
+            ele.closest('.col-md-4').remove()
+
+            Swal .fire({
+                title:"Card deleted successfully !!!",
+                icon:"success",
+                timer:3000
+            })
+        }
+    }
+    xhr.send(null)   
+
+    //XHR send
+}
+
 
 postForm.addEventListener('submit', onAddcard)
 updateCardbtn.addEventListener("click", onUpdatecard)
