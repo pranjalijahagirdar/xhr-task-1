@@ -30,8 +30,8 @@ xhr.onload = function(){
                             <p class="m-0">${post.body}</p>
                         </div>
                         <div class="card-footer d-flex justify-content-between">
-                            <button class="btn btn-sm btn-primary">Edit</button>
-                            <button class="btn btn-sm btn-danger">Remove</button>
+                            <button onclick="editCard(this)" class="btn btn-sm btn-primary">Edit</button>
+                            <button onclick="removeCard(this)" class="btn btn-sm btn-danger">Remove</button>
                         </div>
                     </div>
                 </div>`
@@ -49,8 +49,8 @@ xhr.onload = function(){
 function onAddcard(eve){
     eve.preventDefault()
     let postObj={
-        titleControl : titleControl.value,
-        bodyControl : bodyControl.value,
+        title : titleControl.value,
+        body : bodyControl.value,
         userId : userId.value,
     }
     let xhr = new XMLHttpRequest();
@@ -72,8 +72,8 @@ function onAddcard(eve){
                             <p class="m-0">${postObj.bodyControl}</p>
                         </div>
                         <div class="card-footer d-flex justify-content-between">
-                            <button onclick="editCard(this)" class="btn btn-sm btn-primary">Edit</button>
-                            <button onclick="removeCard(this)" class="btn btn-sm btn-danger">Remove</button>
+                            <button onclick="editCard(this)" class="btn btn-sm btn-primary" role="button">Edit</button>
+                            <button onclick="removeCard(this)" class="btn btn-sm btn-danger"role="button">Remove</button>
                         </div>
                 </div>`
             
@@ -94,31 +94,62 @@ function onAddcard(eve){
 
 //edit 
 
-// function onEdit(ele){
-//     let EDIT_ID = ele.closest('.col-md-4').id;
-//     localStorage.setItem("EDIT_ID", EDIT_ID);
-//     let SINGLE_POST_URL = `${BASE_URL}/posts/${EDIT_ID}`
-//     let xhr = new XMLHttpRequest();
-//     xhr.open("GET", SINGLE_POST-URL);
-//     xhr.send(null);
+function editCard(ele){
+    let EDIT_ID = ele.closest('.col-md-4').id;
+    localStorage.setItem("EDIT_ID", EDIT_ID);
+    let SINGLE_POST_URL = `${BASE_URL}/posts/${EDIT_ID}`
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", SINGLE_POST_URL);
+    xhr.send(null);
 
-//     xhr.onload = function (){
-//         if(xhr.status === 200){
-//             let res = JSON.parse(xhr.response);
-//             cl(res);
-//             //patch data in form-controls
-//             titleControl.value = res.titleControl;
-//             bodyControl.value = res.bodyControl;
-//             userId.value = res.userId;
-//             addCardbtn.classList.add('d-none')
-//             updateCardbtn.classList.remove('d-none')
+    xhr.onload = function (){
+        if(xhr.status === 200){
+            let res = JSON.parse(xhr.response);
+            cl(res);
+            //patch data in form-controls
+            titleControl.value = res.title;
+            bodyControl.value = res.body;
+            userId.value = res.userId;
+            addCardbtn.classList.add('d-none')
+            updateCardbtn.classList.remove('d-none')
 
-//         }else{
-//             cl(`something went wrong !!!`)
-//         }
-//     }
-// }
+        }else{
+            cl(`something went wrong !!!`)
+        }
+    }
+}
 
+//update 
 
+function onUpdatecard(){
+    let Update_Id = localStorage.getItem("EDIT_ID");
+    let update_Obj ={
+        title:titleControl.value,
+        body:bodyControl.value,
+        userId: userId.value,
+    };
+    let UPDATE_URL = `${BASE_URL}/posts/${Update_Id}`
+    let xhr = new XMLHttpRequest();
+    xhr.open("PATCH", UPDATE_URL)
+
+    xhr.send(JSON.stringify(update_Obj));
+
+    xhr.onload = function(){
+        if(xhr.status === 200){
+            let res = JSON.parse(xhr.response)
+            let col = document.getElementById(Update_Id)
+            let h3 = col.querySelector(".card-header h3");
+            let p = col.querySelector(".card-body p");
+            h3.innerText = update_Obj.title;
+            p.innerText = update_Obj.body;
+            postForm.reset()
+            addCardbtn.classList.remove('d-none')
+            updateCardbtn.classList.add('d-none')
+        }else{
+            cl(`something went wrong !!!`)
+        }
+    }
+}
 
 postForm.addEventListener('submit', onAddcard)
+updateCardbtn.addEventListener("click", onUpdatecard)
